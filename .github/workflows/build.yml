@@ -165,11 +165,10 @@ jobs:
           cp artifacts/cimgui-win-x64/cimgui.dll release/cimgui.win-x64.dll
           cp artifacts/cimgui-win-ARM64/cimgui.dll release/cimgui.win-arm64.dll
           cp artifacts/cimgui-linux-x64/cimgui.so release/cimgui.so
-#         cp artifacts/cimgui-osx/cimgui.dylib release/cimgui.dylib
           cp artifacts/definitions/definitions.json release/
           cp artifacts/definitions/structs_and_enums.json release/
           ls -la release/
-
+          
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
