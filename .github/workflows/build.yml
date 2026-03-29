@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cimgui-win-${{ matrix.arch }}
-          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimplot.dll
+          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimgui.dll
 
       - name: Configure CMake for CImPlot
         run: |
@@ -63,14 +63,14 @@ jobs:
 
       - name: Build CImPlot
         run: |
-          cd cimgui/build/${{ matrix.arch }}
+          cd cimplot/build/${{ matrix.arch }}
           cmake --build . --config ${{ env.BUILD_TYPE }}
 
       - name: Upload artifact for CImPlot
         uses: actions/upload-artifact@v4
         with:
-          name: cimgui-win-${{ matrix.arch }}
-          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimplot.dll
+          name: cimplot-win-${{ matrix.arch }}
+          path: cimplot/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimplot.dll
 
   build-linux:
     runs-on: ubuntu-latest
