@@ -164,8 +164,8 @@ jobs:
         with:
           name: definitions
           path: |
-            definitions.json
-            structs_and_enums.json
+            definitions.cimplot.json
+            structs_and_enums.cimplot.json
 
   create-release:
     needs: [build-windows, build-linux, generate-definitions]
