@@ -162,7 +162,7 @@ jobs:
       - name: Upload definitions for CImPlot
         uses: actions/upload-artifact@v4
         with:
-          name: definitions
+          name: definitions.cimplot
           path: |
             definitions.cimplot.json
             structs_and_enums.cimplot.json
@@ -198,8 +198,8 @@ jobs:
           cp artifacts/cimplot-win-x64/cimplot.dll release/cimplot.win-x64.dll
           cp artifacts/cimplot-win-ARM64/cimplot.dll release/cimplot.win-arm64.dll
           cp artifacts/cimplot-linux-x64/cimplot.so release/cimplot.so
-          cp artifacts/definitions/definitions.cimplot.json release/
-          cp artifacts/definitions/structs_and_enums.cimplot.json release/
+          cp artifacts/definitions.cimplot/definitions.cimplot.json release/
+          cp artifacts/definitions.cimplot/structs_and_enums.cimplot.json release/
 
           ls -la release/
 
