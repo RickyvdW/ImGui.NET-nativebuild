@@ -82,6 +82,34 @@ jobs:
           name: cimgui-linux-x64
           path: cimgui/build/Release/cimgui.so
 
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure CMake (Universal Binary)
+        run: |
+          cd cimgui
+          mkdir -p build/Release
+          cd build/Release
+          cmake ../.. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+
+      - name: Build
+        run: |
+          cd cimgui/build/Release
+          make
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimgui-osx
+          path: cimgui/build/Release/cimgui.dylib
+
   generate-definitions:
     runs-on: ubuntu-latest
     steps:
