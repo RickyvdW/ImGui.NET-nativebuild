@@ -52,7 +52,25 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cimgui-win-${{ matrix.arch }}
-          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimgui.dll
+          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimplot.dll
+
+      - name: Configure CMake for CImPlot
+        run: |
+          cd cimplot
+          mkdir -p build/${{ matrix.arch }}
+          cd build/${{ matrix.arch }}
+          cmake ../.. -A ${{ matrix.cmake_arch }} -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+
+      - name: Build CImPlot
+        run: |
+          cd cimgui/build/${{ matrix.arch }}
+          cmake --build . --config ${{ env.BUILD_TYPE }}
+
+      - name: Upload artifact for CImPlot
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimgui-win-${{ matrix.arch }}
+          path: cimgui/build/${{ matrix.arch }}/${{ env.BUILD_TYPE }}/cimplot.dll
 
   build-linux:
     runs-on: ubuntu-latest
@@ -82,33 +100,23 @@ jobs:
           name: cimgui-linux-x64
           path: cimgui/build/Release/cimgui.so
 
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Configure CMake (Universal Binary)
+      - name: Configure CMake for CImPlot
         run: |
-          cd cimgui
+          cd cimplot
           mkdir -p build/Release
           cd build/Release
-          cmake ../.. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+          cmake ../.. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
         run: |
-          cd cimgui/build/Release
+          cd cimplot/build/Release
           make
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cimgui-osx
-          path: cimgui/build/Release/cimgui.dylib
+          name: cimplot-linux-x64
+          path: cimplot/build/Release/cimplot.so
 
   generate-definitions:
     runs-on: ubuntu-latest
@@ -134,6 +142,24 @@ jobs:
           cp cimgui/generator/output/structs_and_enums.json .
 
       - name: Upload definitions
+        uses: actions/upload-artifact@v4
+        with:
+          name: definitions
+          path: |
+            definitions.json
+            structs_and_enums.json
+
+      - name: Generate definitions for CImPlot
+        run: |
+          cd cimplot/generator
+          luajit ./generator.lua gcc "internal noimstrv"
+
+      - name: Copy definitions to root for CImPlot
+        run: |
+          cp cimplot/generator/output/definitions.json ./definitions.cimplot.json
+          cp cimplot/generator/output/structs_and_enums.json ./structs_and_enums.cimplot.json
+
+      - name: Upload definitions for CImPlot
         uses: actions/upload-artifact@v4
         with:
           name: definitions
@@ -167,8 +193,16 @@ jobs:
           cp artifacts/cimgui-linux-x64/cimgui.so release/cimgui.so
           cp artifacts/definitions/definitions.json release/
           cp artifacts/definitions/structs_and_enums.json release/
+
+          cp artifacts/cimplot-win-x86/cimplot.dll release/cimplot.win-x86.dll
+          cp artifacts/cimplot-win-x64/cimplot.dll release/cimplot.win-x64.dll
+          cp artifacts/cimplot-win-ARM64/cimplot.dll release/cimplot.win-arm64.dll
+          cp artifacts/cimplot-linux-x64/cimplot.so release/cimplot.so
+          cp artifacts/definitions/definitions.cimplot.json release/
+          cp artifacts/definitions/structs_and_enums.cimplot.json release/
+
           ls -la release/
-          
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
